@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Записи блога</title>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+<body>
+
+<div class='container'>
+<div class='col-sm-12'>
+
+<h1>{{ post.title }}</h1>
+
+
+<p class='lead'>{{ post.content }}</p>
+
+<small>{{ post.timestamp }}</small>
+
+
+<h2>Поиск поддоменов</h2>
+<hr>
+<div class='col-sm-12' id='comments'>
+</div>
+<div class='col-sm-12' id='data'>
+<form action='' id='data_form' method='POST'>
+<input type='hidden' id='user' value="{{ user.username }}", data-post='{{ post.slug }}'>
+{% csrf_token %}
+{{ form.as_p }}
+<input type='submit' class='btn btn-default' value='Submit'>
+</form>
+
+
+        <div id='out_data'>
+        Output data:
+        </div>
+
+
+</div>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<script>
+
+    var socket_url = 'ws://' + window.location.host + window.location.pathname
+    console.log(socket_url)
+
+    var socket = new WebSocket(socket_url)
+
+    socket.onmessage = function(event){
+        console.log('Get data', event)
+
+        var newComment = JSON.parse(event.data)
+        console.log('Data', newComment.data)
+        $('#out_data').append('<p>' + newComment.data + '</p>')
+    }
+
+    socket.onopen = function(event){
+    console.log('socket opened', event)
+    var form = $('#data_form')
+    form.submit(function (e){
+        e.preventDefault()
+        var main_domain = $('#id_main_domain').val()
+        var deep = $('#id_depth').val()
+        console.log('Main', main_domain)
+        data = {
+            'domain': main_domain,
+            'deep': deep,
+        }
+        console.log('Data', data)
+        socket.send(JSON.stringify(data))
+    })
+    
+    }
+
+    socket.onclose = function(event){
+        console.log('socket closed', event)
+    }
+
+</script>
+</div>
+</body>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</html>
