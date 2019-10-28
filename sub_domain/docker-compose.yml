@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+    sub_domains_1:
+      build: .
+      command: python3 manage.py runserver 0.0.0.0:8080
+      ports:
+      - '8080:8080'
